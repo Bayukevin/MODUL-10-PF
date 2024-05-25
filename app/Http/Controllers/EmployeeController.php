@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\EmployeesExport;
+use Barryvdh\DomPDF\Facade\pdf;
 
 
 
@@ -22,8 +25,11 @@ class EmployeeController extends Controller
         $pageTitle = 'Employee List';
 
         confirmDelete();
-
-        return view('employee.index', compact('pageTitle'));
+        $positions = Position::all();
+        return view('employee.index', [
+            'pageTitle' => $pageTitle,
+            'positions' => $positions
+     ]);
     }
 
 
@@ -210,5 +216,21 @@ class EmployeeController extends Controller
                 ->toJson();
         }
     }
+
+    public function exportPdf()
+    {
+        $employees = Employee::all();
+
+        $pdf = PDF::loadView('employee.export_pdf', compact('employees'));
+
+        return $pdf->download('employees.pdf');
+    }
+
+
+    // public function exportExcel()
+    // {
+    //     return Excel::download(new EmployeesExport, 'employees.xlsx');
+    // }
+
 
 }
